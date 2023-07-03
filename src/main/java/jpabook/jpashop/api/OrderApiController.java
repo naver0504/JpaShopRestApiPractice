@@ -7,16 +7,14 @@ import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
 import jpabook.jpashop.repository.order.query.OrderFlatDto;
-import jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
+import jpabook.jpashop.service.OrderQueryService;
+import jpabook.jpashop.service.OrderQueryService.OrderDtoV2;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +31,7 @@ public class OrderApiController {
 
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
+    private final OrderQueryService orderQueryService;
 
     @GetMapping("/api/v1/orders")
     public ResponseEntity<?> orderV1() {
@@ -74,6 +73,16 @@ public class OrderApiController {
         List<OrderDto> collect = orders.stream()
                 .map(o -> new OrderDto(o))
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(collect);
+
+    }
+
+
+    @GetMapping("/api/v3.2/orders")
+    public ResponseEntity<?> orderV3_2page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                          @RequestParam(value = "limit", defaultValue = "100") int limit) {
+
+        List<OrderDtoV2> collect = orderQueryService.orderV3_2(offset, limit);
         return ResponseEntity.ok(collect);
 
     }
