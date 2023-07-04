@@ -7,6 +7,7 @@ import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import static jpabook.jpashop.domain.OrderItem.*;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -49,6 +51,23 @@ public class OrderService {
 
     public List<Order> findOrders(OrderSearch orderSearch) {
         return orderRepository.findAll(orderSearch);
+    }
+
+    public List<Order> findOrders3_3(int offset, int limit) {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
+
+        orders.stream()
+                .forEach(o -> {
+                    o.getOrderItems().size();
+                    log.info("order = {}", o);
+                    o.getOrderItems().stream()
+                            .forEach(oi -> {
+                                oi.getItem().getName();
+                            });
+                });
+
+        return orders;
+
     }
 
 

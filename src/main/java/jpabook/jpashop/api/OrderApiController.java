@@ -11,6 +11,7 @@ import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import jpabook.jpashop.service.OrderQueryService;
 import jpabook.jpashop.service.OrderQueryService.OrderDtoV2;
+import jpabook.jpashop.service.OrderService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,8 @@ public class OrderApiController {
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
     private final OrderQueryService orderQueryService;
+
+    private final OrderService orderService;
 
     @GetMapping("/api/v1/orders")
     public ResponseEntity<?> orderV1() {
@@ -83,6 +86,18 @@ public class OrderApiController {
                                           @RequestParam(value = "limit", defaultValue = "100") int limit) {
 
         List<OrderDtoV2> collect = orderQueryService.orderV3_2(offset, limit);
+        return ResponseEntity.ok(collect);
+
+    }
+
+    @GetMapping("/api/v3.3/orders")
+    public ResponseEntity<?> orderV3_3page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                           @RequestParam(value = "limit", defaultValue = "100") int limit) {
+
+        List<Order> orders = orderService.findOrders3_3(offset, limit);
+        List<OrderDto> collect = orders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(Collectors.toList());
         return ResponseEntity.ok(collect);
 
     }
